@@ -33,7 +33,12 @@ class Resource extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Zone, Monster, Resource])
+class MonsterZone extends Table {
+  IntColumn get monsterId => integer()();
+  IntColumn get zoneId => integer()();
+}
+
+@DriftDatabase(tables: [Zone, Monster, Resource, MonsterZone])
 class Database extends _$Database {
   Database() : super(_openConnection());
 
@@ -41,6 +46,15 @@ class Database extends _$Database {
   int get schemaVersion => 1;
 
   Future<List<ZoneData>> getAllZones() => select(zone).get();
+
+  //TODO:Finish the query with the correct where clause
+  Future<List<MonsterData>> getMonstersFromZone(zoneName) async {
+    final query = select(monster).join([
+      leftOuterJoin(monsterZone, monsterZone.monsterId.equalsExp(monster.id)),
+      leftOuterJoin(zone, zone.id.equalsExp(monsterZone.zoneId)),
+    ]);
+    return query.map((row) => row.readTable(monster)).get();
+  }
 }
 
 LazyDatabase _openConnection() {

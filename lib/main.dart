@@ -7,8 +7,11 @@ var database;
 Future<void> main() async {
   database = Database();
   final allZones = await database.getAllZones();
-
   print("First zone: ${allZones[0]}");
+
+  final monstersFromZone = await database.getMonstersFromZone("Zone1");
+  print("First monster: ${monstersFromZone[0]}");
+
   runApp(const App());
 }
 
